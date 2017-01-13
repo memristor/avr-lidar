@@ -1,0 +1,10 @@
+.dep
+.idea
+build
+cmake-build-debug
+*.eep
+*.elf
+*.lss
+*.hex
+*.map
+*.sym
