@@ -1,4 +1,4 @@
-# Actuator Control Board
+# Lidar  Board
 
 ## Cross-compilation
 Install required packages
