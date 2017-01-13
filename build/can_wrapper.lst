@@ -1,0 +1,243 @@
+   1               		.file	"can_wrapper.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__RAMPZ__ = 0x3b
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+   8               		.text
+   9               	.Ltext0:
+  10               		.cfi_sections	.debug_frame
+  11               	.global	can_wrapper_init
+  13               	can_wrapper_init:
+  14               	.LFB1:
+  15               		.file 1 "can_wrapper.c"
+   1:can_wrapper.c **** #include "can_wrapper.h"
+   2:can_wrapper.c **** 
+   3:can_wrapper.c **** uint8_t can_wrapper_init(void) {
+  16               		.loc 1 3 0
+  17               		.cfi_startproc
+  18 0000 1F93      		push r17
+  19               	.LCFI0:
+  20               		.cfi_def_cfa_offset 3
+  21               		.cfi_offset 17, -2
+  22 0002 CF93      		push r28
+  23               	.LCFI1:
+  24               		.cfi_def_cfa_offset 4
+  25               		.cfi_offset 28, -3
+  26 0004 DF93      		push r29
+  27               	.LCFI2:
+  28               		.cfi_def_cfa_offset 5
+  29               		.cfi_offset 29, -4
+  30 0006 CDB7      		in r28,__SP_L__
+  31 0008 DEB7      		in r29,__SP_H__
+  32               	.LCFI3:
+  33               		.cfi_def_cfa_register 28
+  34 000a 2997      		sbiw r28,9
+  35               	.LCFI4:
+  36               		.cfi_def_cfa_offset 14
+  37 000c 0FB6      		in __tmp_reg__,__SREG__
+  38 000e F894      		cli
+  39 0010 DEBF      		out __SP_H__,r29
+  40 0012 0FBE      		out __SREG__,__tmp_reg__
+  41 0014 CDBF      		out __SP_L__,r28
+  42               	/* prologue: function */
+  43               	/* frame size = 9 */
+  44               	/* stack size = 12 */
+  45               	.L__stack_usage = 12
+   4:can_wrapper.c ****     uint8_t status;
+   5:can_wrapper.c **** 
+   6:can_wrapper.c ****     // Initialize MCP2515
+   7:can_wrapper.c ****     status = can_init(BITRATE_125_KBPS);
+  46               		.loc 1 7 0
+  47 0016 84E0      		ldi r24,lo8(4)
+  48 0018 0E94 0000 		call can_init
+  49               	.LVL0:
+  50 001c 182F      		mov r17,r24
+  51               	.LVL1:
+   8:can_wrapper.c **** 
+   9:can_wrapper.c ****     // Set filter to receive all messages
+  10:can_wrapper.c ****     can_filter_t filter = {
+  52               		.loc 1 10 0
+  53 001e BE01      		movw r22,r28
+  54 0020 6F5F      		subi r22,-1
+  55 0022 7F4F      		sbci r23,-1
+  56 0024 89E0      		ldi r24,lo8(9)
+  57 0026 FB01      		movw r30,r22
+  58               		0:
+  59 0028 1192      		st Z+,__zero_reg__
+  60 002a 8A95      		dec r24
+  61 002c 01F4      		brne 0b
+  11:can_wrapper.c ****         .id = 0,
+  12:can_wrapper.c ****         .mask = 0,
+  13:can_wrapper.c ****         .flags = {
+  14:can_wrapper.c ****             .rtr = 0,
+  15:can_wrapper.c ****             .extended = 0
+  16:can_wrapper.c ****         }
+  17:can_wrapper.c ****     };
+  18:can_wrapper.c ****     can_set_filter(0, &filter);
+  62               		.loc 1 18 0
+  63 002e 80E0      		ldi r24,0
+  64 0030 0E94 0000 		call can_set_filter
+  65               	.LVL2:
+  19:can_wrapper.c **** 
+  20:can_wrapper.c ****     // Enable interrupts
+  21:can_wrapper.c ****     sei();
+  66               		.loc 1 21 0
+  67               	/* #APP */
+  68               	 ;  21 "can_wrapper.c" 1
+  69 0034 7894      		sei
+  70               	 ;  0 "" 2
+  22:can_wrapper.c **** 
+  23:can_wrapper.c ****     return status;
+  24:can_wrapper.c **** }
+  71               		.loc 1 24 0
+  72               	/* #NOAPP */
+  73 0036 812F      		mov r24,r17
+  74               	/* epilogue start */
+  75 0038 2996      		adiw r28,9
+  76 003a 0FB6      		in __tmp_reg__,__SREG__
+  77 003c F894      		cli
+  78 003e DEBF      		out __SP_H__,r29
+  79 0040 0FBE      		out __SREG__,__tmp_reg__
+  80 0042 CDBF      		out __SP_L__,r28
+  81 0044 DF91      		pop r29
+  82 0046 CF91      		pop r28
+  83 0048 1F91      		pop r17
+  84               	.LVL3:
+  85 004a 0895      		ret
+  86               		.cfi_endproc
+  87               	.LFE1:
+  89               	.global	can_wrapper_send
+  91               	can_wrapper_send:
+  92               	.LFB2:
+  25:can_wrapper.c **** 
+  26:can_wrapper.c **** uint8_t can_wrapper_send(uint32_t id, uint8_t length, ...) {
+  93               		.loc 1 26 0
+  94               		.cfi_startproc
+  95               	.LVL4:
+  96 004c CF93      		push r28
+  97               	.LCFI5:
+  98               		.cfi_def_cfa_offset 3
+  99               		.cfi_offset 28, -2
+ 100 004e DF93      		push r29
+ 101               	.LCFI6:
+ 102               		.cfi_def_cfa_offset 4
+ 103               		.cfi_offset 29, -3
+ 104 0050 CDB7      		in r28,__SP_L__
+ 105 0052 DEB7      		in r29,__SP_H__
+ 106               	.LCFI7:
+ 107               		.cfi_def_cfa_register 28
+ 108 0054 2E97      		sbiw r28,14
+ 109               	.LCFI8:
+ 110               		.cfi_def_cfa_offset 18
+ 111 0056 0FB6      		in __tmp_reg__,__SREG__
+ 112 0058 F894      		cli
+ 113 005a DEBF      		out __SP_H__,r29
+ 114 005c 0FBE      		out __SREG__,__tmp_reg__
+ 115 005e CDBF      		out __SP_L__,r28
+ 116               	/* prologue: function */
+ 117               	/* frame size = 14 */
+ 118               	/* stack size = 16 */
+ 119               	.L__stack_usage = 16
+ 120 0060 9F89      		ldd r25,Y+23
+  27:can_wrapper.c ****     can_t msg;
+  28:can_wrapper.c ****     va_list pl;
+  29:can_wrapper.c ****     uint_fast8_t i;
+  30:can_wrapper.c **** 
+  31:can_wrapper.c ****     msg.id = id;
+ 121               		.loc 1 31 0
+ 122 0062 4B89      		ldd r20,Y+19
+ 123 0064 5C89      		ldd r21,Y+20
+ 124 0066 6D89      		ldd r22,Y+21
+ 125 0068 7E89      		ldd r23,Y+22
+ 126 006a 4983      		std Y+1,r20
+ 127 006c 5A83      		std Y+2,r21
+ 128 006e 6B83      		std Y+3,r22
+ 129 0070 7C83      		std Y+4,r23
+  32:can_wrapper.c ****     msg.flags.rtr = 0;
+ 130               		.loc 1 32 0
+ 131 0072 8D81      		ldd r24,Y+5
+  33:can_wrapper.c ****     msg.flags.extended = 1;
+ 132               		.loc 1 33 0
+ 133 0074 8E7F      		andi r24,lo8(-2)
+ 134 0076 8260      		ori r24,lo8(1<<1)
+ 135 0078 8D83      		std Y+5,r24
+  34:can_wrapper.c ****     msg.length = length;
+ 136               		.loc 1 34 0
+ 137 007a 9E83      		std Y+6,r25
+ 138               	.LVL5:
+ 139 007c FE01      		movw r30,r28
+ 140 007e 7896      		adiw r30,24
+ 141 0080 DE01      		movw r26,r28
+ 142 0082 1796      		adiw r26,7
+  35:can_wrapper.c **** 
+  36:can_wrapper.c ****     va_start(pl, length);
+  37:can_wrapper.c ****     for (i = 0; i < length; i++) {
+ 143               		.loc 1 37 0
+ 144 0084 80E0      		ldi r24,0
+ 145               	.LVL6:
+ 146               	.L3:
+ 147               		.loc 1 37 0 is_stmt 0 discriminator 1
+ 148 0086 8913      		cpse r24,r25
+ 149 0088 00C0      		rjmp .L4
+  38:can_wrapper.c ****         uint8_t x = va_arg(pl, int);
+  39:can_wrapper.c ****         msg.data[i] = x;
+  40:can_wrapper.c ****     }
+  41:can_wrapper.c ****     va_end(pl);
+  42:can_wrapper.c **** 
+  43:can_wrapper.c ****     return can_send_message(&msg);
+ 150               		.loc 1 43 0 is_stmt 1
+ 151 008a CE01      		movw r24,r28
+ 152               	.LVL7:
+ 153 008c 0196      		adiw r24,1
+ 154 008e 0E94 0000 		call can_send_message
+ 155               	.LVL8:
+ 156               	/* epilogue start */
+  44:can_wrapper.c **** }...
+ 157               		.loc 1 44 0
+ 158 0092 2E96      		adiw r28,14
+ 159 0094 0FB6      		in __tmp_reg__,__SREG__
+ 160 0096 F894      		cli
+ 161 0098 DEBF      		out __SP_H__,r29
+ 162 009a 0FBE      		out __SREG__,__tmp_reg__
+ 163 009c CDBF      		out __SP_L__,r28
+ 164 009e DF91      		pop r29
+ 165 00a0 CF91      		pop r28
+ 166 00a2 0895      		ret
+ 167               	.LVL9:
+ 168               	.L4:
+ 169               	.LBB2:
+  38:can_wrapper.c ****         uint8_t x = va_arg(pl, int);
+ 170               		.loc 1 38 0
+ 171 00a4 2081      		ld r18,Z
+ 172 00a6 3296      		adiw r30,2
+ 173               	.LVL10:
+ 174 00a8 2D93      		st X+,r18
+ 175               	.LBE2:
+  37:can_wrapper.c ****     for (i = 0; i < length; i++) {
+ 176               		.loc 1 37 0
+ 177 00aa 8F5F      		subi r24,lo8(-(1))
+ 178               	.LVL11:
+ 179 00ac 00C0      		rjmp .L3
+ 180               		.cfi_endproc
+ 181               	.LFE2:
+ 183               	.Letext0:
+ 184               		.file 2 "/usr/avr/include/stdint.h"
+ 185               		.file 3 "can.h"
+ 186               		.file 4 "/usr/lib/gcc/avr/6.3.0/include/stdarg.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 can_wrapper.c
+     /tmp/cc1VKGDs.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/cc1VKGDs.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/cc1VKGDs.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/cc1VKGDs.s:5      *ABS*:000000000000003b __RAMPZ__
+     /tmp/cc1VKGDs.s:6      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/cc1VKGDs.s:7      *ABS*:0000000000000001 __zero_reg__
+     /tmp/cc1VKGDs.s:13     .text:0000000000000000 can_wrapper_init
+     /tmp/cc1VKGDs.s:91     .text:000000000000004c can_wrapper_send
+
+UNDEFINED SYMBOLS
+can_init
+can_set_filter
+can_send_message

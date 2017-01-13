@@ -1,0 +1,169 @@
+   1               		.file	"main.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__RAMPZ__ = 0x3b
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+   8               		.text
+   9               	.Ltext0:
+  10               		.cfi_sections	.debug_frame
+  11               		.section	.text.startup,"ax",@progbits
+  12               	.global	main
+  14               	main:
+  15               	.LFB7:
+  16               		.file 1 "main.c"
+   1:main.c        **** #include <avr/io.h>
+   2:main.c        **** #include <avr/interrupt.h>
+   3:main.c        **** #include <avr/pgmspace.h>
+   4:main.c        **** #include <stdint.h>
+   5:main.c        **** #include <util/delay.h>
+   6:main.c        **** #include "can.h"
+   7:main.c        **** #include "can_wrapper.h"
+   8:main.c        **** 
+   9:main.c        **** uint8_t lastState = 0;
+  10:main.c        **** uint8_t state = 0;
+  11:main.c        **** 
+  12:main.c        **** int main(void) {
+  17               		.loc 1 12 0
+  18               		.cfi_startproc
+  19 0000 CF93      		push r28
+  20               	.LCFI0:
+  21               		.cfi_def_cfa_offset 3
+  22               		.cfi_offset 28, -2
+  23 0002 DF93      		push r29
+  24               	.LCFI1:
+  25               		.cfi_def_cfa_offset 4
+  26               		.cfi_offset 29, -3
+  27 0004 CDB7      		in r28,__SP_L__
+  28 0006 DEB7      		in r29,__SP_H__
+  29               	.LCFI2:
+  30               		.cfi_def_cfa_register 28
+  31 0008 2E97      		sbiw r28,14
+  32               	.LCFI3:
+  33               		.cfi_def_cfa_offset 18
+  34 000a 0FB6      		in __tmp_reg__,__SREG__
+  35 000c F894      		cli
+  36 000e DEBF      		out __SP_H__,r29
+  37 0010 0FBE      		out __SREG__,__tmp_reg__
+  38 0012 CDBF      		out __SP_L__,r28
+  39               	/* prologue: function */
+  40               	/* frame size = 14 */
+  41               	/* stack size = 16 */
+  42               	.L__stack_usage = 16
+  13:main.c        ****     can_wrapper_init();
+  43               		.loc 1 13 0
+  44 0014 0E94 0000 		call can_wrapper_init
+  45               	.LVL0:
+  14:main.c        **** 
+  15:main.c        ****     DDRA = 0x00;
+  46               		.loc 1 15 0
+  47 0018 11B8      		out 0x1,__zero_reg__
+  16:main.c        **** 
+  17:main.c        ****     while (1) {
+  18:main.c        ****         state = (PINA & (1 << PD3)) >> PD3;
+  19:main.c        ****         if (state != lastState) {
+  20:main.c        ****             lastState = state;
+  21:main.c        ****             can_wrapper_send(0x08, 1, state);
+  48               		.loc 1 21 0
+  49 001a 11E0      		ldi r17,lo8(1)
+  50 001c 08E0      		ldi r16,lo8(8)
+  51               	.L3:
+  18:main.c        ****         if (state != lastState) {
+  52               		.loc 1 18 0
+  53 001e 80B1      		in r24,0
+  54 0020 83FB      		bst r24,3
+  55 0022 8827      		clr r24
+  56 0024 80F9      		bld r24,0
+  57 0026 8093 0000 		sts state,r24
+  19:main.c        ****             lastState = state;
+  58               		.loc 1 19 0
+  59 002a 9091 0000 		lds r25,lastState
+  60 002e 8917      		cp r24,r25
+  61 0030 01F0      		breq .L2
+  20:main.c        ****             can_wrapper_send(0x08, 1, state);
+  62               		.loc 1 20 0
+  63 0032 8093 0000 		sts lastState,r24
+  64               		.loc 1 21 0
+  65 0036 1F92      		push __zero_reg__
+  66 0038 8F93      		push r24
+  67 003a 1F93      		push r17
+  68 003c 1F92      		push __zero_reg__
+  69 003e 1F92      		push __zero_reg__
+  70 0040 1F92      		push __zero_reg__
+  71 0042 0F93      		push r16
+  72 0044 0E94 0000 		call can_wrapper_send
+  73               	.LVL1:
+  74 0048 0FB6      		in __tmp_reg__,__SREG__
+  75 004a F894      		cli
+  76 004c DEBF      		out __SP_H__,r29
+  77 004e 0FBE      		out __SREG__,__tmp_reg__
+  78 0050 CDBF      		out __SP_L__,r28
+  79               	.L2:
+  22:main.c        ****         }
+  23:main.c        **** 
+  24:main.c        ****         // Check if a new messag was received
+  25:main.c        ****         if (can_check_message()) {
+  80               		.loc 1 25 0
+  81 0052 0E94 0000 		call can_check_message
+  82               	.LVL2:
+  83 0056 8823      		tst r24
+  84 0058 01F0      		breq .L3
+  85               	.LBB2:
+  26:main.c        ****             can_t msg;
+  27:main.c        **** 
+  28:main.c        ****             // Try to read the message
+  29:main.c        ****             if (can_get_message(&msg)) {
+  86               		.loc 1 29 0
+  87 005a CE01      		movw r24,r28
+  88 005c 0196      		adiw r24,1
+  89 005e 0E94 0000 		call can_get_message
+  90               	.LVL3:
+  91 0062 8823      		tst r24
+  92 0064 01F0      		breq .L3
+  30:main.c        ****                 msg.data[0]++;
+  93               		.loc 1 30 0
+  94 0066 8F81      		ldd r24,Y+7
+  95 0068 8F5F      		subi r24,lo8(-(1))
+  96 006a 8F83      		std Y+7,r24
+  31:main.c        ****                 can_send_message(&msg);
+  97               		.loc 1 31 0
+  98 006c CE01      		movw r24,r28
+  99 006e 0196      		adiw r24,1
+ 100 0070 0E94 0000 		call can_send_message
+ 101               	.LVL4:
+ 102 0074 00C0      		rjmp .L3
+ 103               	.LBE2:
+ 104               		.cfi_endproc
+ 105               	.LFE7:
+ 107               	.global	state
+ 108               		.section .bss
+ 111               	state:
+ 112 0000 00        		.zero	1
+ 113               	.global	lastState
+ 116               	lastState:
+ 117 0001 00        		.zero	1
+ 118               		.text
+ 119               	.Letext0:
+ 120               		.file 2 "/usr/avr/include/stdint.h"
+ 121               		.file 3 "can.h"
+ 122               		.file 4 "can_wrapper.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 main.c
+     /tmp/cccqvu3i.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/cccqvu3i.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/cccqvu3i.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/cccqvu3i.s:5      *ABS*:000000000000003b __RAMPZ__
+     /tmp/cccqvu3i.s:6      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/cccqvu3i.s:7      *ABS*:0000000000000001 __zero_reg__
+     /tmp/cccqvu3i.s:14     .text.startup:0000000000000000 main
+     /tmp/cccqvu3i.s:111    .bss:0000000000000000 state
+     /tmp/cccqvu3i.s:116    .bss:0000000000000001 lastState
+
+UNDEFINED SYMBOLS
+can_wrapper_init
+can_wrapper_send
+can_check_message
+can_get_message
+can_send_message
+__do_clear_bss
