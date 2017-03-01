@@ -7,7 +7,7 @@ apt-get install avr-binutils avr-gcc avr-libc avrdude
 ```
 and run
 ```
-make program
+sudo make program
 ```
 you should now get successfully flashed microcontroller.
 
