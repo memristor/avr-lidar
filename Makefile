@@ -80,7 +80,7 @@ OBJDIR = build
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = ./src/main.c ./src/circbuff.c ./src/xv11.c
+SRC = ./src/main.c ./src/circbuff.c ./src/xv11.c ./src/regulation.c
 
 # Libs here
 SRC += ./libs/can/can_wrapper.c

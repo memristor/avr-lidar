@@ -1,9 +1,9 @@
 #include "regulation.h"
-#include "can_wrapper.h"
+#include <can/can_wrapper.h>
 
-#ifndef REGULATION_SPEED
-#define REGULATION_SPEED 120
-#endif
+
+static void set_speed(uint8_t);
+
 /*
  
     SET Kp IN FUNCTION regulation_update !!!
@@ -45,6 +45,10 @@ void regulation_init() {
 
     DDRB |= (1 << PB7);
     PORTB &= ~(1 << PB7);
+    
+    
+    // Set initial speed
+    set_speed(REGULATION_MIN_DUTY);
 }
 
 /******************************************************************
@@ -69,9 +73,7 @@ This can be used to control the brightness of LED or Speed of Motor.
 *********************************************************************/
 
 void set_speed(uint8_t duty) {
-   
     OCR0A=duty;
-
 }
 
 
@@ -85,8 +87,6 @@ void regulation_update(uint16_t tmp_speed) {
         error = REGULATION_SPEED - tmp_speed;
         duty += Kp * error;
         set_speed(duty);
-        can_wrapper_send(0x01,2,error, duty);
+        //can_wrapper_send(0x01,2,error, duty);
     }
-    
-    
 }

@@ -3,6 +3,7 @@
 #include <avr/io.h>
 #include <can/can_wrapper.h>
 #include <can/can.h>
+#include "regulation.h"
 #include "circbuff.h"
 
 static uint16_t calculate_checksum(uint8_t* data);
@@ -17,6 +18,7 @@ ISR(USART1_RX_vect) {
 
 void xv11_init(void) {
 	circbuff_init(&recv_buffer);
+	regulation_init();
 	
 	// Set UART baudrate
 	UBRR1H = ((F_CPU / 16 + XV11_BAUDRATE / 2) / XV11_BAUDRATE - 1) >> 8;
@@ -108,9 +110,12 @@ uint8_t try_parse_and_send(void) {
 		msg.data[1] = angle & 0xff;
 		msg.data[2] = (distance & 0xff00) >> 8;
 		msg.data[3] = distance & 0xff;
-		msg.length = 4;
+		msg.data[4] = speed;
+		msg.length = 5;
 		can_send_message(&msg);
 	}
+	
+	regulation_update(speed);
 	
 	return 0;
 }
