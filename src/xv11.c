@@ -1,5 +1,6 @@
 #include "xv11.h"
 
+#include <stdbool.h>
 #include <avr/io.h>
 #include <can/can_wrapper.h>
 #include <can/can.h>
@@ -11,6 +12,8 @@ static uint8_t try_parse_and_send(void);
 
 static volatile circbuff_t recv_buffer;
 static packet_phase_t phase = PHASE_START;
+static uint8_t ignored_cycles = 0;
+static bool msg_send_enabled = true;
 
 ISR(USART1_RX_vect) {
 	circbuff_add(&recv_buffer, UDR1);
@@ -99,20 +102,36 @@ uint8_t try_parse_and_send(void) {
 		angle = (index - 0xA0) * 4 + i;
 		quality = (byte3 << 8) | byte2;
 		
+		if (angle == 0) {
+			ignored_cycles++;
+			if (ignored_cycles >= XV11_IGNORE_CYCLES) {
+				ignored_cycles = 0;
+				msg_send_enabled = true;
+			} else {
+				msg_send_enabled = false;
+			}
+		}
+
 		
-		
-		can_t msg;
-		msg.id = XV11_ID;
-		msg.flags.rtr = 0;
-		msg.flags.extended = 1;
-		msg.data[0] = (strength_warning << 7) | ((angle & 0x7F00) >> 8);
-		msg.data[1] = angle & 0xff;
-		msg.data[2] = (distance & 0xff00) >> 8;
-		msg.data[3] = distance & 0xff;
-		msg.data[4] = speed;
-		msg.length = 5;
-		//can_send_message(&msg);
-	}
+		// Ignore some data
+		if (invalid_data == 1 || strength_warning == 1) {
+			continue;
+		}
+
+		// Send CAN message
+		if (msg_send_enabled == true) {
+			can_t msg;
+			msg.id = XV11_ID;
+			msg.flags.rtr = 0;
+			msg.flags.extended = 1;
+			msg.data[0] = ((angle & 0x7F00) >> 8);
+			msg.data[1] = angle & 0xff;
+			msg.data[2] = (distance & 0xff00) >> 8;
+			msg.data[3] = distance & 0xff;
+			msg.length = 4;
+			can_send_message(&msg);
+		}
+    }
 	
 	regulation_update(speed);
 	
