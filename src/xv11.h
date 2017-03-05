@@ -3,6 +3,7 @@
 
 #define XV11_BAUDRATE 115200
 #define XV11_ID 8000
+#define XV11_IGNORE_CYCLES 2
 
 // Reference: https://xv11hacking.wikispaces.com/LIDAR+Sensor
 
