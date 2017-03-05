@@ -3,7 +3,7 @@
 
 
 static void set_speed(uint8_t);
-
+uint8_t duty = 100;
 /*
  
     SET Kp IN FUNCTION regulation_update !!!
@@ -48,7 +48,11 @@ void regulation_init() {
     
     
     // Set initial speed
-    set_speed(REGULATION_MIN_DUTY);
+    set_speed(0);
+    _delay_ms(2000);
+    set_speed(255);
+    _delay_ms(2000);
+    
 }
 
 /******************************************************************
@@ -80,13 +84,24 @@ void set_speed(uint8_t duty) {
 
 void regulation_update(uint16_t tmp_speed) {
     int16_t error;
-    uint8_t duty = 0;
-    int Kp = 1;
     
-    if(tmp_speed != REGULATION_SPEED) {
+    int Kp = 10;
+    can_wrapper_send(0x20,2,tmp_speed >> 8,tmp_speed & 0xff);
+    
+    if(tmp_speed < REGULATION_SPEED) {
+        set_speed(duty + 1);
+    } else {
+        set_speed(duty - 1);
+    }
+    /*  if(tmp_speed != REGULATION_SPEED) {
         error = REGULATION_SPEED - tmp_speed;
-        duty += Kp * error;
+        if(error > 0) duty += Kp * error;
+        if(error < 0) duty -= Kp * error;
+        
+        if(duty > 255) duty = 255;
+        if(duty < REGULATION_MIN_DUTY) duty = REGULATION_MIN_DUTY;
+        
         set_speed(duty);
         //can_wrapper_send(0x01,2,error, duty);
-    }
+    }*/
 }

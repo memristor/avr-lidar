@@ -10,6 +10,7 @@
 int main(void) {
     can_wrapper_init();
     xv11_init();
+    regulation_init();
 	sei();
     
     can_wrapper_send(XV11_ID, 1, 1);

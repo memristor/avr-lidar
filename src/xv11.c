@@ -18,7 +18,6 @@ ISR(USART1_RX_vect) {
 
 void xv11_init(void) {
 	circbuff_init(&recv_buffer);
-	regulation_init();
 	
 	// Set UART baudrate
 	UBRR1H = ((F_CPU / 16 + XV11_BAUDRATE / 2) / XV11_BAUDRATE - 1) >> 8;
@@ -112,7 +111,7 @@ uint8_t try_parse_and_send(void) {
 		msg.data[3] = distance & 0xff;
 		msg.data[4] = speed;
 		msg.length = 5;
-		can_send_message(&msg);
+		//can_send_message(&msg);
 	}
 	
 	regulation_update(speed);
