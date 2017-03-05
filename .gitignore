@@ -9,3 +9,4 @@ cmake-build-debug
 *.hex
 *.map
 *.sym
+*.kate-swp
