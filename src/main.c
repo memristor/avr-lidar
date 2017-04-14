@@ -6,18 +6,23 @@
 #include <can/can.h>
 #include <can/can_wrapper.h>
 #include "xv11.h"
+#include "regulation.h"
 
 int main(void) {
-    can_wrapper_init();
+    // Init CAN bus
+	can_init(BITRATE_500_KBPS);
+    
+    // Init lidar (XV-11)
     xv11_init();
+    
+    // Init regulation for lidar
     regulation_init();
+    
+    // Enable interruputs
 	sei();
-    
-    can_wrapper_send(XV11_ID, 1, 1);
-    
+        
     while(true) {
 		xv11_update();
-		//_delay_ms(100);
 	}
 	
 	return 0;

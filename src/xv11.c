@@ -114,7 +114,7 @@ uint8_t try_parse_and_send(void) {
 
 		
 		// Ignore some data
-		if (invalid_data == 1 || strength_warning == 1) {
+		if (invalid_data == 1 || strength_warning == 1 || distance > XV11_IGNORE_DISTANCE) {
 			continue;
 		}
 
