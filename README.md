@@ -1,13 +1,13 @@
 # Lidar  Board
 
 ## Cross-compilation
-Install required packages
-```
-apt-get install avr-binutils avr-gcc avr-libc avrdude
-```
+Install required packages  
+- Debian (Ubuntu) `sudo apt-get install binutils-avr gcc-avr avr-libc avrdude`
+- Arch `sudo pacman -S avr-binutils avr-gcc avr-libc avrdude`
+
 and run
 ```
-sudo make program
+make program
 ```
 you should now get successfully flashed microcontroller.
 
