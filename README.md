@@ -5,17 +5,8 @@ Install required packages
 - Debian (Ubuntu) `sudo apt-get install binutils-avr gcc-avr avr-libc avrdude`
 - Arch `sudo pacman -S avr-binutils avr-gcc avr-libc avrdude`
 
-and run
-```
-make program
-```
+and run `sudo make program` (or `sudo make program AVRDUDE_PROGRAMMER=jtag1 AVRDUDE_PORT=/dev/ttyUSB0` for JTAG)
 you should now get successfully flashed microcontroller.
-
-If you use JTAG programmer, in makefile change instead of "usbasp" put "jtag1"
-and instead of "com1" put "/dev/ttyUSB0".
-```
-avrdude -p at90can128 -P /dev/ttyUSB0 -c jtag1 -U flash:w:lidar_board.hex -F
-```
 
 ## Fuse bits
 By default at90can128 uses internal oscillator (8MHz) and to configure external 
