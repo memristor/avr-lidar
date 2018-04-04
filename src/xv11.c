@@ -21,12 +21,12 @@ ISR(USART1_RX_vect) {
 
 void xv11_init(void) {
 	circbuff_init(&recv_buffer);
-	
+
 	// Set UART baudrate
 	UBRR1H = ((F_CPU / 16 + XV11_BAUDRATE / 2) / XV11_BAUDRATE - 1) >> 8;
 	UBRR1L = ((F_CPU / 16 + XV11_BAUDRATE / 2) / XV11_BAUDRATE - 1);
-	
-	// Enable receiver and transmitter 
+
+	// Enable receiver and transmitter
 	UCSR1B |= (1 << TXEN1);
 	UCSR1B |= (1 << RXEN1);
 	UCSR1B |= (1 << RXCIE1);
@@ -37,22 +37,22 @@ uint16_t calculate_checksum(uint8_t* data) {
 	uint16_t data_list[10];
 	uint32_t chk32;
 	uint16_t checksum;
-	
+
 	// Group the data by word, little-endian
 	for (t = 0; t < 10; t++) {
 		data_list[t] = data[2 * t] + (data[2 * t + 1] << 8);
 	}
-	
+
 	// Compute the checksum on 32 bits
 	chk32 = 0;
 	for (t = 0; t < 10; t++) {
 		chk32 = (chk32 << 1) + data_list[t];
 	}
-	
+
 	// Return a value wrapped around on 15bits, and truncated to still fit into 15 bits
 	checksum = (chk32 & 0x7FFF) + (chk32 >> 15);
 	checksum = checksum & 0x7FFF;
-	return checksum; 
+	return checksum;
 }
 
 uint8_t try_parse_and_send(void) {
@@ -66,8 +66,8 @@ uint8_t try_parse_and_send(void) {
 	uint16_t angle;
 	uint16_t checksum;
 	uint16_t quality;
-	
-	
+
+
 	// Set phase
 	phase = PHASE_START;
 
@@ -80,10 +80,10 @@ uint8_t try_parse_and_send(void) {
 
 
 	// Check checksum
-	checksum = (packet[21] << 8) | packet[20];	
+	checksum = (packet[21] << 8) | packet[20];
 	if (checksum != calculate_checksum(packet)) {
 		return 1;
-	} 
+	}
 
 	// Parse packet
 	index = packet[1];
@@ -95,13 +95,13 @@ uint8_t try_parse_and_send(void) {
 		uint8_t byte1 = packet[4 * (1 + i) + 1];
 		uint8_t byte2 = packet[4 * (1 + i) + 2];
 		uint8_t byte3 = packet[4 * (1 + i) + 3];
-		
+
 		invalid_data = (byte1 & 0x80) >> 7;
 		strength_warning = (byte1 & 0x40) >> 6;
 		distance = ((byte1 & 0x3f) << 8) | byte0;
 		angle = (index - 0xA0) * 4 + i;
 		quality = (byte3 << 8) | byte2;
-		
+
 		if (angle == 0) {
 			ignored_cycles++;
 			if (ignored_cycles >= XV11_IGNORE_CYCLES) {
@@ -112,7 +112,7 @@ uint8_t try_parse_and_send(void) {
 			}
 		}
 
-		
+
 		// Ignore some data
 		if (invalid_data == 1 || strength_warning == 1 || distance > XV11_IGNORE_DISTANCE) {
 			continue;
@@ -132,9 +132,9 @@ uint8_t try_parse_and_send(void) {
 			can_send_message(&msg);
 		}
     }
-	
+
 	regulation_update(speed);
-	
+
 	return 0;
 }
 
@@ -148,5 +148,5 @@ void xv11_update(void) {
 		if (circbuff_size(&recv_buffer) >= 22 - 1) {
 			try_parse_and_send();
 		}
-	}	
+	}
 }

@@ -1,0 +1,15 @@
+#ifndef _CONFIG_H_
+#define _CONFIG_H_
+
+#ifndef F_CPU
+#define F_CPU 16000000UL
+#endif
+
+#define CANBUS_BITRATE BITRATE_500_KBPS
+#define CAN_FILTER_ID 0x00007E00
+#define XV11_IGNORE_DISTANCE 4000
+#define XV11_BAUDRATE 115200
+#define XV11_ID 0x00007E00
+#define XV11_IGNORE_CYCLES 0
+
+#endif

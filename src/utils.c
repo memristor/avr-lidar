@@ -4,7 +4,7 @@
 #include <avr/interrupt.h>
 #include <util/atomic.h>
 
-static volatile uint_least64_t timer_millis = 0; 
+static volatile uint_least64_t timer_millis = 0;
 
 ISR (TIMER1_COMPA_vect) {
     timer_millis++;
@@ -18,7 +18,7 @@ void utils_init(void) {
     // into the output compare
     OCR1AH = (CTC_MATCH_OVERFLOW >> 8);
     OCR1AL = (uint8_t)CTC_MATCH_OVERFLOW;
- 
+
     // Enable the compare match interrupt
     TIMSK1 |= (1 << OCIE1A);
 }

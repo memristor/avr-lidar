@@ -5,25 +5,28 @@
 #include <util/delay.h>
 #include <can/can.h>
 #include <can/can_wrapper.h>
+#include "CanBus.h"
 #include "xv11.h"
 #include "regulation.h"
+#include "Config.h"
 
 int main(void) {
+
     // Init CAN bus
-	can_init(BITRATE_500_KBPS);
-    
+	CANbus_Init();
+
     // Init lidar (XV-11)
-    xv11_init();
-    
+  xv11_init();
+
     // Init regulation for lidar
-    regulation_init();
-    
+  regulation_init();
+
     // Enable interruputs
 	sei();
-        
+
     while(true) {
-		xv11_update();
-	}
-	
+			xv11_update();
+		}
+
 	return 0;
 }
