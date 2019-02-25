@@ -4,8 +4,11 @@
 #include <avr/io.h>
 #include <can/can_wrapper.h>
 #include <can/can.h>
+
+
 #include "regulation.h"
 #include "circbuff.h"
+#include "uart.h"
 
 static uint16_t calculate_checksum(uint8_t* data);
 static uint8_t try_parse_and_send(void);
@@ -15,21 +18,9 @@ static packet_phase_t phase = PHASE_START;
 static uint8_t ignored_cycles = 0;
 static bool msg_send_enabled = true;
 
-ISR(USART1_RX_vect) {
-	circbuff_add(&recv_buffer, UDR1);
-}
-
 void xv11_init(void) {
 	circbuff_init(&recv_buffer);
-
-	// Set UART baudrate
-	UBRR1H = ((F_CPU / 16 + XV11_BAUDRATE / 2) / XV11_BAUDRATE - 1) >> 8;
-	UBRR1L = ((F_CPU / 16 + XV11_BAUDRATE / 2) / XV11_BAUDRATE - 1);
-
-	// Enable receiver and transmitter
-	UCSR1B |= (1 << TXEN1);
-	UCSR1B |= (1 << RXEN1);
-	UCSR1B |= (1 << RXCIE1);
+	uart_init(XV11_BAUDRATE,0);
 }
 
 uint16_t calculate_checksum(uint8_t* data) {
@@ -139,6 +130,10 @@ uint8_t try_parse_and_send(void) {
 }
 
 void xv11_update(void) {
+	while(uart_available()) {
+		circbuff_add(&recv_buffer, uart_read());
+	}
+	
 	if (phase == PHASE_START) {
 		unsigned char data = circbuff_remove(&recv_buffer);
 		if (data == 0xFA) {

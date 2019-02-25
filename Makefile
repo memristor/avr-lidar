@@ -41,7 +41,8 @@
 
 
 # MCU name
-MCU = at90can128
+# MCU = at90can128
+MCU = atmega64m1
 
 
 # Processor frequency.
@@ -80,7 +81,8 @@ OBJDIR = build
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = ./src/main.c ./src/circbuff.c ./src/xv11.c ./src/regulation.c ./src/utils.c ./src/CanBus.c
+SRC = ./src/main.c ./src/circbuff.c ./src/xv11.c ./src/regulation.c ./src/utils.c ./src/CanBus.c \
+	./src/uart.c
 
 # Libs here
 SRC += ./libs/can/can_wrapper.c
