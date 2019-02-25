@@ -5,11 +5,15 @@ static void update_speed(void);
 static uint8_t duty = REGULATION_START_DUTY;
 
 void regulation_init(void) {
-    TCCR0A|=(1<<WGM00)|(1<<WGM01)|(1<<COM0A1)|(1<<CS00);
+    // TCCR0A|=(1<<WGM00)|(1<<WGM01)|(1<<COM0A1)|(1<<CS00);
+    TCCR0A|=(1<<WGM00)|(1<<WGM01)|(1<<COM0B1)|(1<<CS00);
 
 	//Set OC0 PIN as output. It is  PB3 on ATmega16 ATmega32
-    DDRB |= (1 << PB7);
-    PORTB &= ~(1 << PB7);
+    // DDRB |= (1 << PB7);
+    // PORTB &= ~(1 << PB7);
+    
+    DDRC |= (1 << PC1);
+    PORTC &= ~(1 << PC1);
    
     // Set initial speed
     update_speed();

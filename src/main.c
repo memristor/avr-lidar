@@ -23,6 +23,7 @@ int main(void) {
 	msg.data[1] = 0xcd;
 	msg.length = 2;
 	can_send_message(&msg);
+	
     // Init lidar (XV-11)
     xv11_init();
 
@@ -33,8 +34,8 @@ int main(void) {
 	sei();
 
     while(true) {
-			xv11_update();
-		}
+		xv11_update();
+	}
 
 	return 0;
 }
